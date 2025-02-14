@@ -3,14 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\RedirectResponse;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Http;
-use GuzzleHttp\RequestOptions;
-use League\Uri\Http as LeagueHttp;
-
-use function Illuminate\Log\log;
 
 class GithubController extends Controller
 {
@@ -37,7 +33,10 @@ class GithubController extends Controller
         }
     }
 
-    private function Headers(string $authorization)
+    /**
+     * @return array<string,string>
+     */
+    private function Headers(string $authorization): array
     {
         return [
             //'Time-Zone' => date_default_timezone_get(), // doesn't work for these endpoints ¯\_(ツ)_/¯
@@ -47,7 +46,7 @@ class GithubController extends Controller
         ];
     }
 
-    public function QueryRepoIssues(Request $request)
+    public function QueryRepoIssues(Request $request): View
     {
         $per_page = max(0, min(100, $request->integer("per_page", 30)));
         $page = max(1, $request->integer("page"));
@@ -76,7 +75,6 @@ class GithubController extends Controller
             ]);
             $pagination = self::PaginationLinks($resp->header("link"));
             $issues = $resp->json();
-            log("issues", ["json" => $issues]);
             if (isset($issues['message'])) {
                 $error = $issues['message'];
                 $issues = [];
@@ -100,7 +98,7 @@ class GithubController extends Controller
         ]);
     }
 
-    public function GetRepoIssue(Request $request, string $owner, string $repo, string $issue_number)
+    public function GetRepoIssue(Request $request, string $owner, string $repo, string $issue_number): View
     {
         $authorization = $this->Authorization($request);
         $authorized = $authorization !== null;
@@ -126,6 +124,9 @@ class GithubController extends Controller
         ]);
     }
 
+    /**
+     * @return array<string,string>
+     */
     private static function PaginationLinks(string $paginationHeader): array
     {
         if (empty($paginationHeader)) {
@@ -148,11 +149,14 @@ class GithubController extends Controller
         return $pagination;
     }
 
+    /**
+     * @return array<string,mixed>
+     */
     private static function IssueInfo(array $githubIssue): array
     {
-        // https://api.github.com/repos/{owner}/{repo}/issues/{issue_number}
         $TZ = new \DateTimeZone(date_default_timezone_get());
 
+        // https://api.github.com/repos/{owner}/{repo}/issues/{issue_number}
         $issue_url = $githubIssue["url"];
         [$owner, $repo, $_, $issue_number] = explode("/", str_replace('https://api.github.com/repos/', '', $issue_url), 4);
         $html_url = $githubIssue["html_url"];
