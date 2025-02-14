@@ -4,7 +4,7 @@
 
 1. Clone the repository
 ```
-git clone https://git.alan.in.net/aland/issueist.git
+git clone https://github.com/Alan-Daniels/issueist.git
 cd ./issueist
 ```
 
