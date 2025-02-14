@@ -28,6 +28,7 @@ php artisan migrate:fresh
 ```
 
 5. Add your github personal token to `.env` as `GITHUB_PERSONAL_TOKEN`.
+Ensure the token has Read access to issues and metadata.
 
 6. Run the development server with `composer run dev`.
 
