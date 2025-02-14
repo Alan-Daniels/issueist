@@ -12,6 +12,7 @@ cd ./issueist
 ```
 composer install
 npm install
+npm run build
 ```
 
 3. copy `.env.example` to `.env` and generate the application key
